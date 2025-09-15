@@ -19,6 +19,12 @@
     },
     "openAiModelVersion": {
       "value": "2024-07-18"
+    },
+    "enableAdvancedSecurity": {
+      "value": true
+    },
+    "restrictPublicNetworkAccess": {
+      "value": false
     }
   }
 }

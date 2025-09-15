@@ -142,7 +142,7 @@ class AzureOpenAIClient:
     
     def generate_response(self, system_prompt: str, user_message: str, conversation_history: List[Dict[str, str]] = None) -> str:
         """
-        Generate a response using Azure OpenAI with Managed Identity authentication
+        Generate a response using Azure OpenAI with Managed Identity authentication and content filtering
         
         Args:
             system_prompt: The system prompt with persona context
@@ -153,31 +153,59 @@ class AzureOpenAIClient:
             Generated response string
         """
         try:
+            # Security limits
+            max_tokens = min(int(os.getenv("AZURE_OPENAI_MAX_TOKENS", "500")), 1000)
+            temperature = max(0.0, min(1.0, float(os.getenv("AZURE_OPENAI_TEMPERATURE", "0.7"))))
+            top_p = max(0.0, min(1.0, float(os.getenv("AZURE_OPENAI_TOP_P", "0.9"))))
+            
             # Build message list
             messages = [{"role": "system", "content": system_prompt}]
             
-            # Add conversation history if provided
+            # Add conversation history if provided (limit to last 10 messages for context window management)
             if conversation_history:
-                messages.extend(conversation_history)
+                # Limit conversation history to prevent token overflow
+                recent_history = conversation_history[-10:] if len(conversation_history) > 10 else conversation_history
+                messages.extend(recent_history)
             
             # Add current user message
             messages.append({"role": "user", "content": user_message})
             
-            # Generate response
+            # Generate response with content filtering
             response = self.client.chat.completions.create(
                 model=self.deployment_name,
                 messages=messages,
-                max_tokens=500,
-                temperature=0.7,
-                top_p=0.9
+                max_tokens=max_tokens,
+                temperature=temperature,
+                top_p=top_p,
+                frequency_penalty=0.0,
+                presence_penalty=0.0,
+                stop=None  # Let Azure OpenAI handle natural stopping
             )
             
-            return response.choices[0].message.content
+            # Log content filtering results if available
+            if hasattr(response, 'prompt_filter_results') and response.prompt_filter_results:
+                logger.info(f"Prompt filter results: {response.prompt_filter_results}")
+            
+            if (hasattr(response, 'choices') and response.choices and 
+                hasattr(response.choices[0], 'content_filter_results') and 
+                response.choices[0].content_filter_results):
+                logger.info(f"Content filter results: {response.choices[0].content_filter_results}")
+            
+            # Return the response or a safe fallback
+            if response.choices and response.choices[0].message.content:
+                return response.choices[0].message.content
+            else:
+                logger.warning("No content returned from Azure OpenAI, possibly filtered")
+                return "I apologize, but I cannot provide a response to that request. Please try rephrasing your question."
             
         except Exception as e:
             logger.error(f"Error generating response: {e}")
             if "authentication" in str(e).lower() or "unauthorized" in str(e).lower():
                 return "Authentication error: Please ensure you have proper permissions to access Azure OpenAI. Check the documentation for setup instructions."
+            elif "content_filter" in str(e).lower():
+                return "I apologize, but I cannot provide a response to that request due to content policy restrictions. Please try rephrasing your question."
+            else:
+                return "I apologize, but I'm experiencing technical difficulties. Please try again later."
             return "I apologize, but I'm having trouble responding right now. Please try again in a moment."
 
 class PersonaBot:

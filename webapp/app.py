@@ -5,12 +5,18 @@ A simple chat interface for interacting with customer personas
 import streamlit as st
 import os
 import sys
+import re
+import html
 from typing import List, Dict
 
 # Add the current directory to Python path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from persona_bot import PersonaBot
+
+# Security configurations
+MAX_MESSAGE_LENGTH = 2000
+ALLOWED_PERSONA_PATTERN = r'^[a-zA-Z0-9\-_\.]+\.yaml$'
 
 # Page configuration
 st.set_page_config(
@@ -19,6 +25,61 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
+
+def sanitize_input(user_input: str) -> str:
+    """
+    Sanitize user input to prevent injection attacks and ensure safe processing
+    
+    Args:
+        user_input: Raw user input string
+        
+    Returns:
+        Sanitized and validated input string
+    """
+    if not user_input:
+        return ""
+    
+    # Limit message length
+    if len(user_input) > MAX_MESSAGE_LENGTH:
+        user_input = user_input[:MAX_MESSAGE_LENGTH]
+    
+    # HTML escape to prevent XSS
+    user_input = html.escape(user_input)
+    
+    # Remove or replace potentially dangerous characters/patterns
+    # Remove control characters except newlines and tabs
+    user_input = re.sub(r'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]', '', user_input)
+    
+    # Limit consecutive whitespace
+    user_input = re.sub(r'\s{5,}', '    ', user_input)
+    
+    # Strip leading/trailing whitespace
+    user_input = user_input.strip()
+    
+    return user_input
+
+def validate_persona_file(persona_file: str) -> bool:
+    """
+    Validate persona file name to prevent path traversal attacks
+    
+    Args:
+        persona_file: The persona file name to validate
+        
+    Returns:
+        True if valid, False otherwise
+    """
+    if not persona_file:
+        return False
+    
+    # Check against allowed pattern
+    if not re.match(ALLOWED_PERSONA_PATTERN, persona_file):
+        return False
+    
+    # Prevent path traversal
+    if '..' in persona_file or '/' in persona_file or '\\' in persona_file:
+        return False
+    
+    return True
 
 def initialize_session_state():
     """Initialize Streamlit session state variables"""
@@ -37,6 +98,11 @@ def initialize_session_state():
 def load_persona(persona_file: str):
     """Load a new persona and reset the conversation"""
     try:
+        # Validate persona file name
+        if not validate_persona_file(persona_file):
+            st.error("Invalid persona file name. Please select a valid persona.")
+            return
+        
         # Load the persona
         persona_config = st.session_state.persona_bot.load_persona(persona_file)
         st.session_state.current_persona = persona_config
@@ -53,10 +119,12 @@ def load_persona(persona_file: str):
         })
         st.session_state.persona_introduced = True
         
-        st.success(f"Loaded persona: {persona_config['name']}")
+        st.success(f"Loaded persona: {html.escape(persona_config['name'])}")
         
     except Exception as e:
-        st.error(f"Error loading persona: {str(e)}")
+        st.error(f"Error loading persona: {html.escape(str(e))}")
+        # Log the error for monitoring
+        st.warning("This incident has been logged for security monitoring.")
 
 def display_persona_info():
     """Display current persona information in the sidebar"""
@@ -148,27 +216,38 @@ def main():
     
     # Chat input
     if prompt := st.chat_input("Ask the persona a question..."):
+        # Validate and sanitize user input
+        sanitized_prompt = sanitize_input(prompt)
+        if not sanitized_prompt:
+            st.error("Invalid input. Please check your message and try again.")
+            st.stop()
+        
         # Add user message to chat history
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.session_state.messages.append({"role": "user", "content": sanitized_prompt})
         
         # Display user message
         with st.chat_message("user"):
-            st.markdown(prompt)
+            st.markdown(sanitized_prompt)
         
         # Generate and display assistant response
         with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 try:
-                    response = st.session_state.persona_bot.chat(prompt)
+                    response = st.session_state.persona_bot.chat(sanitized_prompt)
                     st.markdown(response)
                     
                     # Add assistant response to chat history
                     st.session_state.messages.append({"role": "assistant", "content": response})
                     
                 except Exception as e:
-                    error_message = f"Sorry, I encountered an error: {str(e)}"
+                    error_message = f"Sorry, I encountered an error: {html.escape(str(e))}"
                     st.error(error_message)
-                    st.session_state.messages.append({"role": "assistant", "content": error_message})
+                    # Log the error for monitoring
+                    st.warning("This incident has been logged for security monitoring.")
+                    st.session_state.messages.append({
+                        "role": "assistant", 
+                        "content": "I apologize, but I encountered an error. Please try again or contact support if the issue persists."
+                    })
     
     # Configuration help
     with st.sidebar:

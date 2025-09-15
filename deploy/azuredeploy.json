@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "metadata": {
-    "description": "Deploys a persona bot application with Azure OpenAI integration using Managed Identity"
+    "description": "Deploys a secure persona bot application with Azure OpenAI integration using Managed Identity and enhanced security controls"
   },
   "parameters": {
     "environmentName": {
@@ -64,6 +64,20 @@
       "metadata": {
         "description": "Version of the OpenAI model to deploy"
       }
+    },
+    "enableAdvancedSecurity": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Enable advanced security features like diagnostic logging and Application Insights"
+      }
+    },
+    "restrictPublicNetworkAccess": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Restrict public network access to OpenAI (requires private endpoints for production)"
+      }
     }
   },
   "variables": {
@@ -71,12 +85,26 @@
     "openAiAccountName": "[concat(variables('resourcePrefix'), '-openai')]",
     "openAiDeploymentName": "[concat(parameters('openAiModelName'), '-deployment')]",
     "appServicePlanName": "[concat(variables('resourcePrefix'), '-plan')]",
-    "webAppName": "[concat(variables('resourcePrefix'), '-webapp')]"
+    "webAppName": "[concat(variables('resourcePrefix'), '-webapp')]",
+    "applicationInsightsName": "[concat(variables('resourcePrefix'), '-ai')]"
   },
   "resources": [
     {
+      "condition": "[parameters('enableAdvancedSecurity')]",
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "name": "[variables('applicationInsightsName')]",
+      "location": "[parameters('location')]",
+      "kind": "web",
+      "properties": {
+        "Application_Type": "web",
+        "publicNetworkAccessForIngestion": "Enabled",
+        "publicNetworkAccessForQuery": "Enabled"
+      }
+    },
+    {
       "type": "Microsoft.CognitiveServices/accounts",
-      "apiVersion": "2024-04-01-preview",
+      "apiVersion": "2023-05-01",
       "name": "[variables('openAiAccountName')]",
       "location": "[parameters('location')]",
       "kind": "OpenAI",
@@ -85,15 +113,16 @@
       },
       "properties": {
         "customSubDomainName": "[variables('openAiAccountName')]",
-        "publicNetworkAccess": "Enabled",
+        "publicNetworkAccess": "[if(parameters('restrictPublicNetworkAccess'), 'Disabled', 'Enabled')]",
         "networkAcls": {
-          "defaultAction": "Allow"
-        }
+          "defaultAction": "[if(parameters('restrictPublicNetworkAccess'), 'Deny', 'Allow')]"
+        },
+        "disableLocalAuth": true
       }
     },
     {
       "type": "Microsoft.CognitiveServices/accounts/deployments",
-      "apiVersion": "2024-04-01-preview",
+      "apiVersion": "2023-05-01",
       "name": "[concat(variables('openAiAccountName'), '/', variables('openAiDeploymentName'))]",
       "dependsOn": [
         "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]"
@@ -104,6 +133,7 @@
           "name": "[parameters('openAiModelName')]",
           "version": "[parameters('openAiModelVersion')]"
         },
+        "raiPolicyName": "Microsoft.Default",
         "scaleSettings": {
           "scaleType": "Standard"
         }
@@ -111,7 +141,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2023-12-01",
+      "apiVersion": "2022-09-01",
       "name": "[variables('appServicePlanName')]",
       "location": "[parameters('location')]",
       "sku": {
@@ -125,21 +155,29 @@
     },
     {
       "type": "Microsoft.Web/sites",
-      "apiVersion": "2023-12-01",
+      "apiVersion": "2022-09-01",
       "name": "[variables('webAppName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
-        "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]"
+        "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]",
+        "[resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))]"
       ],
       "identity": {
         "type": "SystemAssigned"
       },
       "properties": {
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "httpsOnly": true,
         "siteConfig": {
           "linuxFxVersion": "PYTHON|3.11",
           "appCommandLine": "python -m streamlit run webapp/app.py --server.port 8000",
+          "minTlsVersion": "1.2",
+          "ftpsState": "Disabled",
+          "remoteDebuggingEnabled": false,
+          "httpLoggingEnabled": true,
+          "detailedErrorLoggingEnabled": true,
+          "requestTracingEnabled": true,
           "appSettings": [
             {
               "name": "AZURE_OPENAI_ENDPOINT",
@@ -164,10 +202,26 @@
             {
               "name": "POST_BUILD_SCRIPT_PATH",
               "value": "post-build.sh"
+            },
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[if(parameters('enableAdvancedSecurity'), reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))).InstrumentationKey, '')]"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[if(parameters('enableAdvancedSecurity'), reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName'))).ConnectionString, '')]"
+            },
+            {
+              "name": "STREAMLIT_SERVER_ENABLE_CORS",
+              "value": "false"
+            },
+            {
+              "name": "STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION",
+              "value": "true"
             }
           ]
         },
-        "httpsOnly": true
+        "clientAffinityEnabled": false
       }
     },
     {
@@ -181,9 +235,22 @@
       "scope": "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]",
       "properties": {
         "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd')]",
-        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2023-12-01', 'full').identity.principalId]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2022-09-01', 'full').identity.principalId]",
         "principalType": "ServicePrincipal"
       }
+    },
+    {
+      "condition": "[parameters('enableAdvancedSecurity')]",
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2015-11-01-preview",
+      "name": "[concat(variables('resourcePrefix'), '-logs')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        }
+      }
+    }
     }
   ],
   "outputs": {
@@ -217,7 +284,7 @@
     },
     "webAppPrincipalId": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2023-12-01', 'full').identity.principalId]",
+      "value": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2022-09-01', 'full').identity.principalId]",
       "metadata": {
         "description": "The principal ID of the web app managed identity"
       }
@@ -227,6 +294,13 @@
       "value": "[variables('webAppName')]",
       "metadata": {
         "description": "The name of the web application"
+      }
+    },
+    "applicationInsightsName": {
+      "type": "string",
+      "value": "[if(parameters('enableAdvancedSecurity'), variables('applicationInsightsName'), '')]",
+      "metadata": {
+        "description": "The name of the Application Insights resource"
       }
     }
   }
