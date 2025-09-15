@@ -54,8 +54,13 @@
     "openAiModelName": {
       "type": "string",
       "defaultValue": "gpt-35-turbo",
+      "allowedValues": [
+        "gpt-35-turbo",
+        "gpt-4",
+        "gpt-4o-mini"
+      ],
       "metadata": {
-        "description": "Name of the OpenAI model to deploy"
+        "description": "Name of the OpenAI model to deploy (select a valid model for your account/region)"
       }
     },
     "openAiModelVersion": {
@@ -63,6 +68,18 @@
       "defaultValue": "0125",
       "metadata": {
         "description": "Version of the OpenAI model to deploy"
+      }
+    },
+    "openAiScaleType": {
+      "type": "string",
+      "defaultValue": "Standard",
+      "allowedValues": [
+        "Standard",
+        "Manual",
+        "GlobalStandard"
+      ],
+      "metadata": {
+        "description": "Scale type for the OpenAI deployment (choose a value supported by the selected model)"
       }
     },
     "enableAdvancedSecurity": {
@@ -78,11 +95,18 @@
       "metadata": {
         "description": "Restrict public network access to OpenAI (requires private endpoints for production)"
       }
+    },
+    "existingOpenAiAccountName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "(Optional) Use an existing Azure OpenAI account name. If provided, the template will reuse this account instead of creating a new one."
+      }
     }
   },
   "variables": {
     "resourcePrefix": "[concat('persona-bot-', parameters('environmentName'), '-', parameters('uniqueSuffix'))]",
-    "openAiAccountName": "[concat(variables('resourcePrefix'), '-openai')]",
+    "openAiAccountName": "[if(equals(parameters('existingOpenAiAccountName'), ''), concat(variables('resourcePrefix'), '-openai'), parameters('existingOpenAiAccountName'))]",
     "openAiDeploymentName": "[concat(parameters('openAiModelName'), '-deployment')]",
     "appServicePlanName": "[concat(variables('resourcePrefix'), '-plan')]",
     "webAppName": "[concat(variables('resourcePrefix'), '-webapp')]",
@@ -103,6 +127,7 @@
       }
     },
     {
+      "condition": "[equals(parameters('existingOpenAiAccountName'), '')]",
       "type": "Microsoft.CognitiveServices/accounts",
       "apiVersion": "2021-04-30",
       "name": "[variables('openAiAccountName')]",
@@ -135,7 +160,7 @@
         },
         "raiPolicyName": "Microsoft.Default",
         "scaleSettings": {
-          "scaleType": "Standard"
+          "scaleType": "[parameters('openAiScaleType')]"
         }
       }
     },
