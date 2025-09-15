@@ -53,14 +53,14 @@
     },
     "openAiModelName": {
       "type": "string",
-      "defaultValue": "gpt-4",
+      "defaultValue": "gpt-35-turbo",
       "metadata": {
         "description": "Name of the OpenAI model to deploy"
       }
     },
     "openAiModelVersion": {
       "type": "string",
-      "defaultValue": "turbo-2024-04-09",
+      "defaultValue": "0125",
       "metadata": {
         "description": "Version of the OpenAI model to deploy"
       }
