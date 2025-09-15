@@ -104,7 +104,7 @@
     },
     {
       "type": "Microsoft.CognitiveServices/accounts",
-      "apiVersion": "2023-05-01",
+      "apiVersion": "2021-04-30",
       "name": "[variables('openAiAccountName')]",
       "location": "[parameters('location')]",
       "kind": "OpenAI",
@@ -122,7 +122,7 @@
     },
     {
       "type": "Microsoft.CognitiveServices/accounts/deployments",
-      "apiVersion": "2023-05-01",
+      "apiVersion": "2021-10-01",
       "name": "[concat(variables('openAiAccountName'), '/', variables('openAiDeploymentName'))]",
       "dependsOn": [
         "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]"
@@ -141,7 +141,7 @@
     },
     {
       "type": "Microsoft.Web/serverfarms",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2021-02-01",
       "name": "[variables('appServicePlanName')]",
       "location": "[parameters('location')]",
       "sku": {
@@ -155,7 +155,7 @@
     },
     {
       "type": "Microsoft.Web/sites",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2021-02-01",
       "name": "[variables('webAppName')]",
       "location": "[parameters('location')]",
       "dependsOn": [
@@ -225,18 +225,32 @@
       }
     },
     {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "name": "[guid(resourceId('Microsoft.Web/sites', variables('webAppName')), resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName')), 'Cognitive Services OpenAI User')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "roleAssignmentDeployment",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('webAppName'))]",
         "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]"
       ],
-      "scope": "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]",
       "properties": {
-        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd')]",
-        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2022-09-01', 'full').identity.principalId]",
-        "principalType": "ServicePrincipal"
+        "mode": "Incremental",
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2020-04-01-preview",
+              "name": "[guid(resourceId('Microsoft.Web/sites', variables('webAppName')), resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName')), 'Cognitive Services OpenAI User')]",
+              "scope": "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd')]",
+                "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2021-02-01', 'full').identity.principalId]",
+                "principalType": "ServicePrincipal"
+              }
+            }
+          ]
+        }
       }
     },
     {
