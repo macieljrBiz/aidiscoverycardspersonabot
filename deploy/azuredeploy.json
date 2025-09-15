@@ -60,7 +60,7 @@
     },
     "openAiModelVersion": {
       "type": "string",
-      "defaultValue": "0613",
+      "defaultValue": "turbo-2024-04-09",
       "metadata": {
         "description": "Version of the OpenAI model to deploy"
       }
