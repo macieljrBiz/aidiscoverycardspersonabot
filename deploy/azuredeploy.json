@@ -136,7 +136,7 @@
         "raiPolicyName": "Microsoft.Default",
         "scaleSettings": {
           "scaleType": "Manual",
-          "capacity": 20
+          "capacity": 3
         }
       }
     },
