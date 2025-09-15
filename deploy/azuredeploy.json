@@ -1,0 +1,233 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "Deploys a persona bot application with Azure OpenAI integration using Managed Identity"
+  },
+  "parameters": {
+    "environmentName": {
+      "type": "string",
+      "defaultValue": "dev",
+      "metadata": {
+        "description": "Environment name (e.g., dev, staging, prod)"
+      }
+    },
+    "uniqueSuffix": {
+      "type": "string",
+      "defaultValue": "[uniqueString(resourceGroup().id)]",
+      "metadata": {
+        "description": "Unique suffix for resource names"
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources"
+      }
+    },
+    "appServicePlanSku": {
+      "type": "string",
+      "defaultValue": "B1",
+      "allowedValues": [
+        "B1",
+        "B2",
+        "B3",
+        "S1",
+        "S2",
+        "S3",
+        "P1v2",
+        "P2v2",
+        "P3v2"
+      ],
+      "metadata": {
+        "description": "SKU for the App Service Plan"
+      }
+    },
+    "openAiApiVersion": {
+      "type": "string",
+      "defaultValue": "2024-08-01-preview",
+      "metadata": {
+        "description": "API version for Azure OpenAI"
+      }
+    },
+    "openAiModelName": {
+      "type": "string",
+      "defaultValue": "gpt-4o-mini",
+      "metadata": {
+        "description": "Name of the OpenAI model to deploy"
+      }
+    },
+    "openAiModelVersion": {
+      "type": "string",
+      "defaultValue": "2024-07-18",
+      "metadata": {
+        "description": "Version of the OpenAI model to deploy"
+      }
+    }
+  },
+  "variables": {
+    "resourcePrefix": "[concat('persona-bot-', parameters('environmentName'), '-', parameters('uniqueSuffix'))]",
+    "openAiAccountName": "[concat(variables('resourcePrefix'), '-openai')]",
+    "openAiDeploymentName": "[concat(parameters('openAiModelName'), '-deployment')]",
+    "appServicePlanName": "[concat(variables('resourcePrefix'), '-plan')]",
+    "webAppName": "[concat(variables('resourcePrefix'), '-webapp')]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.CognitiveServices/accounts",
+      "apiVersion": "2024-04-01-preview",
+      "name": "[variables('openAiAccountName')]",
+      "location": "[parameters('location')]",
+      "kind": "OpenAI",
+      "sku": {
+        "name": "S0"
+      },
+      "properties": {
+        "customSubDomainName": "[variables('openAiAccountName')]",
+        "publicNetworkAccess": "Enabled",
+        "networkAcls": {
+          "defaultAction": "Allow"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/deployments",
+      "apiVersion": "2024-04-01-preview",
+      "name": "[concat(variables('openAiAccountName'), '/', variables('openAiDeploymentName'))]",
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]"
+      ],
+      "properties": {
+        "model": {
+          "format": "OpenAI",
+          "name": "[parameters('openAiModelName')]",
+          "version": "[parameters('openAiModelVersion')]"
+        },
+        "scaleSettings": {
+          "scaleType": "Standard"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2023-12-01",
+      "name": "[variables('appServicePlanName')]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('appServicePlanSku')]",
+        "capacity": 1
+      },
+      "kind": "linux",
+      "properties": {
+        "reserved": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2023-12-01",
+      "name": "[variables('webAppName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]"
+      ],
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+        "siteConfig": {
+          "linuxFxVersion": "PYTHON|3.11",
+          "appCommandLine": "python -m streamlit run webapp/app.py --server.port 8000",
+          "appSettings": [
+            {
+              "name": "AZURE_OPENAI_ENDPOINT",
+              "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))).endpoint]"
+            },
+            {
+              "name": "AZURE_OPENAI_API_VERSION",
+              "value": "[parameters('openAiApiVersion')]"
+            },
+            {
+              "name": "AZURE_OPENAI_DEPLOYMENT_NAME",
+              "value": "[variables('openAiDeploymentName')]"
+            },
+            {
+              "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+              "value": "true"
+            },
+            {
+              "name": "ENABLE_ORYX_BUILD",
+              "value": "true"
+            },
+            {
+              "name": "POST_BUILD_SCRIPT_PATH",
+              "value": "post-build.sh"
+            }
+          ]
+        },
+        "httpsOnly": true
+      }
+    },
+    {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceId('Microsoft.Web/sites', variables('webAppName')), resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName')), 'Cognitive Services OpenAI User')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('webAppName'))]",
+        "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]"
+      ],
+      "scope": "[resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))]",
+      "properties": {
+        "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd')]",
+        "principalId": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2023-12-01', 'full').identity.principalId]",
+        "principalType": "ServicePrincipal"
+      }
+    }
+  ],
+  "outputs": {
+    "webAppUrl": {
+      "type": "string",
+      "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('webAppName'))).defaultHostName)]",
+      "metadata": {
+        "description": "The URL of the deployed web application"
+      }
+    },
+    "openAiAccountName": {
+      "type": "string",
+      "value": "[variables('openAiAccountName')]",
+      "metadata": {
+        "description": "The name of the Azure OpenAI resource"
+      }
+    },
+    "openAiEndpoint": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))).endpoint]",
+      "metadata": {
+        "description": "The endpoint URL of the Azure OpenAI resource"
+      }
+    },
+    "openAiDeploymentName": {
+      "type": "string",
+      "value": "[variables('openAiDeploymentName')]",
+      "metadata": {
+        "description": "The deployment name for the OpenAI model"
+      }
+    },
+    "webAppPrincipalId": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2023-12-01', 'full').identity.principalId]",
+      "metadata": {
+        "description": "The principal ID of the web app managed identity"
+      }
+    },
+    "webAppName": {
+      "type": "string",
+      "value": "[variables('webAppName')]",
+      "metadata": {
+        "description": "The name of the web application"
+      }
+    }
+  }
+}

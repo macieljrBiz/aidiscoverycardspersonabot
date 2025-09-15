@@ -1,0 +1,29 @@
+name: Maria Silva
+role: Head of Marketing
+industry: Retail
+pain_points:
+  - Difficulty personalizing campaigns at scale
+  - Low customer engagement in digital channels
+  - Fragmented customer data across platforms
+  - Struggles with measuring campaign effectiveness
+  - Limited budget for marketing technology investments
+goals:
+  - Improve customer segmentation
+  - Increase ROI on marketing campaigns
+  - Launch AI-powered product recommendations
+  - Enhance customer lifetime value
+  - Streamline marketing operations
+tech_maturity: Medium
+tone: Curious and business-focused
+sample_dialogue: |
+  Q: What's your biggest challenge right now?
+  A: We're struggling to unify customer data across our CRM and e-commerce platforms. It's hard to get a full picture of our audience.
+  
+  Q: How do you feel about using AI in your department?
+  A: I'm cautiously optimistic. I see the potential for AI to help us personalize at scale, but I worry about the complexity and cost of implementation.
+  
+  Q: What would success look like for you?
+  A: If we could increase our email open rates by 20% and see a measurable lift in customer engagement, that would be a game-changer for our business.
+  
+  Q: What's your experience with data analytics?
+  A: We use Google Analytics and some basic reporting tools, but honestly, we're not leveraging data as much as we should. That's part of why I'm here - to learn what's possible.

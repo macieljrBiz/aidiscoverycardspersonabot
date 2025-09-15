@@ -1,0 +1,17 @@
+# Core web framework
+streamlit>=1.28.0
+
+# Azure OpenAI integration
+openai>=1.12.0
+
+# Azure Identity for Managed Identity authentication
+azure-identity>=1.15.0
+
+# YAML configuration parsing
+PyYAML>=6.0
+
+# Additional utilities
+python-dotenv>=1.0.0
+
+# For production deployment
+gunicorn>=21.2.0
