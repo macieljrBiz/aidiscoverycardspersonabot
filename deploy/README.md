@@ -4,9 +4,7 @@ This document provides step-by-step instructions for deploying the Persona Bot t
 
 ## Quick Deploy to Azure
 
-[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2F%5BYOUR_USERNAME%5D%2F%5BYOUR_REPO%5D%2Fmain%2Fdeploy%2Fazuredeploy.json)
-
-> **Note**: Replace `[YOUR_USERNAME]` and `[YOUR_REPO]` in the button URL above with your actual GitHub username and repository name.
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FmacieljrBiz%2Faidiscoverycardspersonabot%2Fmain%2Fdeploy%2Fazuredeploy.json)
 
 Click the "Deploy to Azure" button above for a one-click deployment experience. This will:
 - Create all required Azure resources (App Service, OpenAI, etc.)

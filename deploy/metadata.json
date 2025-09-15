@@ -2,7 +2,7 @@
   "title": "AI Discovery Cards Persona Bot",
   "description": "Deploy an AI-powered persona bot for customer discovery sessions with Azure OpenAI integration",
   "summary": "This template deploys a Streamlit web application that simulates customer personas using Azure OpenAI, complete with managed identity authentication and proper RBAC permissions.",
-  "githubUsername": "[YOUR_GITHUB_USERNAME]",
+  "githubUsername": "macieljrBiz",
   "dateUpdated": "2024-01-20",
   "type": "QuickStart"
 }
