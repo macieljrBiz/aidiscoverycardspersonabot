@@ -53,14 +53,14 @@
     },
     "openAiModelName": {
       "type": "string",
-      "defaultValue": "gpt-4o-mini",
+      "defaultValue": "gpt-4",
       "metadata": {
         "description": "Name of the OpenAI model to deploy"
       }
     },
     "openAiModelVersion": {
       "type": "string",
-      "defaultValue": "2024-07-18",
+      "defaultValue": "0613",
       "metadata": {
         "description": "Version of the OpenAI model to deploy"
       }
