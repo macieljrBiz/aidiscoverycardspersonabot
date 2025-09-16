@@ -160,26 +160,38 @@ The ARM template deploys:
 
 ### Configuration Parameters
 
-You can customize the deployment by modifying `deploy/azuredeploy.parameters.json`:
+Edit `deploy/azuredeploy.parameters.json` (only supported keys shown):
 
-```json
+```jsonc
 {
-  "environmentName": { "value": "dev" },        // Environment: dev, test, prod
-  "location": { "value": "eastus2" },           // Azure region
-  "appServicePlanSku": { "value": "B1" },       // App Service plan size
-  "openAiModelName": { "value": "gpt-4o-mini" } // OpenAI model
+  "location": { "value": "eastus" },                  // Azure region supporting Azure OpenAI
+  "environment": { "value": "dev" },                  // dev | test | staging | prod (used in names)
+  "appServicePlanSku": { "value": "B1" },             // B1/B2/B3/S1/S2/S3/P1v2/...
+  "openAiDeploymentName": { "value": "gpt4mini" },    // Logical deployment name used by app
+  "openAiModelName": { "value": "gpt-4o-mini" },      // Fixed allowed value (locked for simplicity)
+  "openAiModelVersion": { "value": "2024-07-18" },    // Model version
+  "openAiCapacity": { "value": 60 },                   // Throughput units (ensure quota)
+  "enableMonitoring": { "value": true },               // Enables Log Analytics + App Insights
+  "restrictOpenAiPublicAccess": { "value": false },    // Set true only if you later add private networking
+  "tags": { "value": { "app": "persona-bot", "env": "dev" } }
 }
 ```
 
+Removed legacy parameters: `environmentName`, `openAiApiVersion`, `enableAdvancedSecurity`, `restrictPublicNetworkAccess`. Passing them will cause a validation error.
+
 ### Environment Variables
 
-The following environment variables are automatically configured:
+Configured automatically on the Web App:
 
-- `AZURE_OPENAI_ENDPOINT` - OpenAI service endpoint
-- `AZURE_OPENAI_API_VERSION` - OpenAI API version
-- `AZURE_OPENAI_DEPLOYMENT_NAME` - Model deployment name
+- `AZURE_OPENAI_ENDPOINT` - Azure OpenAI endpoint (from account reference)
+- `AZURE_OPENAI_DEPLOYMENT_NAME` - Deployment name (your `openAiDeploymentName` parameter)
+- `AZURE_OPENAI_MODEL_NAME` - Model name (gpt-4o-mini)
+- `AZURE_OPENAI_MODEL_VERSION` - Model version
+- Build/runtime helpers: `SCM_DO_BUILD_DURING_DEPLOYMENT`, `ENABLE_ORYX_BUILD`
 
-**Note:** No API keys are stored or managed - the application uses Managed Identity for secure authentication.
+Notably removed: `AZURE_OPENAI_API_VERSION` (the SDK / client should infer correct API via model deployment; if your code requires an API version you can inject one manually).
+
+Security: No API keys stored. Access is via the Web App's System Assigned Managed Identity with the "Cognitive Services OpenAI User" role.
 
 ## Alternative Deployment Methods
 

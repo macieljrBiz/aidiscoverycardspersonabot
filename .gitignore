@@ -256,3 +256,7 @@ __blobstorage__
 __queuestorage__
 __azurite_db*__.json
 .azure-functions-core-tools
+
+# vicente's local files
+deploy/testdeploy.json
+deploy/testdeploy.parameters.json
