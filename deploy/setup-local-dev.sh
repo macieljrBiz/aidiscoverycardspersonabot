@@ -81,6 +81,44 @@ OPENAI_ENDPOINT=$(az cognitiveservices account show \
     --resource-group "$RESOURCE_GROUP" \
     --query properties.endpoint -o tsv)
 
+# Get available deployments
+echo ""
+echo "🚀 Checking available deployments..."
+
+DEPLOYMENTS=$(az cognitiveservices account deployment list \
+    --name "$OPENAI_RESOURCE_NAME" \
+    --resource-group "$RESOURCE_GROUP" \
+    --query "[].name" -o tsv 2>/dev/null) || {
+    echo "⚠️  Could not retrieve deployments. Using default 'gpt-4o-mini'"
+    SELECTED_DEPLOYMENT="gpt-4o-mini"
+}
+
+if [ ! -z "$DEPLOYMENTS" ]; then
+    # Convert to array
+    IFS=$'\n' read -d '' -r -a DEPLOYMENT_ARRAY <<< "$DEPLOYMENTS" || true
+    
+    if [ ${#DEPLOYMENT_ARRAY[@]} -eq 1 ]; then
+        SELECTED_DEPLOYMENT="${DEPLOYMENT_ARRAY[0]}"
+        echo "✅ Found deployment: $SELECTED_DEPLOYMENT"
+    else
+        echo "ℹ️  Multiple deployments found:"
+        for i in "${!DEPLOYMENT_ARRAY[@]}"; do
+            echo "   $((i + 1)). ${DEPLOYMENT_ARRAY[$i]}"
+        done
+        
+        while true; do
+            read -p "🎯 Choose deployment (1-${#DEPLOYMENT_ARRAY[@]}): " CHOICE
+            if [[ "$CHOICE" =~ ^[0-9]+$ ]] && [ "$CHOICE" -ge 1 ] && [ "$CHOICE" -le ${#DEPLOYMENT_ARRAY[@]} ]; then
+                SELECTED_DEPLOYMENT="${DEPLOYMENT_ARRAY[$((CHOICE - 1))]}"
+                echo "✅ Selected deployment: $SELECTED_DEPLOYMENT"
+                break
+            else
+                echo "❌ Invalid choice. Please enter a number between 1 and ${#DEPLOYMENT_ARRAY[@]}"
+            fi
+        done
+    fi
+fi
+
 echo ""
 echo "📝 Creating .env file..."
 
@@ -91,7 +129,7 @@ cat > ../webapp/.env << EOF
 
 AZURE_OPENAI_ENDPOINT=$OPENAI_ENDPOINT
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
-AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o-mini
+AZURE_OPENAI_DEPLOYMENT_NAME=$SELECTED_DEPLOYMENT
 EOF
 
 echo "✅ Created .env file at webapp/.env"

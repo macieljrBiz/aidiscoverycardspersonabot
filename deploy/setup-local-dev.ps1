@@ -1,14 +1,14 @@
 # Local Development Setup Script for Persona Bot (PowerShell)
 # This script helps set up local development permissions for Azure OpenAI
 
-Write-Host "🤖 Persona Bot - Local Development Setup" -ForegroundColor Green
+Write-Host "[ROBOT] Persona Bot - Local Development Setup" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Green
 
 # Check if Azure CLI is installed
 try {
     az --version | Out-Null
 } catch {
-    Write-Host "❌ Azure CLI is not installed. Please install it first:" -ForegroundColor Red
+    Write-Host "[X] Azure CLI is not installed. Please install it first:" -ForegroundColor Red
     Write-Host "   https://docs.microsoft.com/en-us/cli/azure/install-azure-cli" -ForegroundColor Yellow
     exit 1
 }
@@ -17,74 +17,106 @@ try {
 try {
     az account show | Out-Null
 } catch {
-    Write-Host "🔐 Please login to Azure first:" -ForegroundColor Yellow
+    Write-Host "[AUTH] Please login to Azure first:" -ForegroundColor Yellow
     az login
 }
 
 # Get current subscription
 $subscriptionId = az account show --query id -o tsv
 $subscriptionName = az account show --query name -o tsv
-Write-Host "📋 Current subscription: $subscriptionName ($subscriptionId)" -ForegroundColor Cyan
+Write-Host "[INFO] Current subscription: $subscriptionName ($subscriptionId)" -ForegroundColor Cyan
 
 # Prompt for resource details
 Write-Host ""
 Write-Host "Please provide the following information:" -ForegroundColor Yellow
-$userEmail = Read-Host "📧 Your Azure user email"
-$resourceGroup = Read-Host "🏢 Resource group name"
-$openAiResourceName = Read-Host "🧠 Azure OpenAI resource name"
+$userEmail = Read-Host "[EMAIL] Your Azure user email"
+$resourceGroup = Read-Host "[RG] Resource group name"
+$openAiResourceName = Read-Host "[AI] Azure OpenAI resource name"
 
 Write-Host ""
-Write-Host "🔍 Validating inputs..." -ForegroundColor Yellow
+Write-Host "[CHECK] Validating inputs..." -ForegroundColor Yellow
 
 # Get user object ID
 try {
     $userObjectId = az ad user show --id $userEmail --query id -o tsv
     if (-not $userObjectId) { throw }
 } catch {
-    Write-Host "❌ Error: Could not find user with email $userEmail" -ForegroundColor Red
+    Write-Host "[X] Error: Could not find user with email $userEmail" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ Found user: $userEmail (ID: $userObjectId)" -ForegroundColor Green
+Write-Host "[OK] Found user: $userEmail (ID: $userObjectId)" -ForegroundColor Green
 
 # Check if resource group exists
 try {
     az group show --name $resourceGroup | Out-Null
 } catch {
-    Write-Host "❌ Error: Resource group '$resourceGroup' does not exist" -ForegroundColor Red
+    Write-Host "[X] Error: Resource group '$resourceGroup' does not exist" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ Found resource group: $resourceGroup" -ForegroundColor Green
+Write-Host "[OK] Found resource group: $resourceGroup" -ForegroundColor Green
 
 # Check if OpenAI resource exists
 try {
     az cognitiveservices account show --name $openAiResourceName --resource-group $resourceGroup | Out-Null
 } catch {
-    Write-Host "❌ Error: Azure OpenAI resource '$openAiResourceName' does not exist in resource group '$resourceGroup'" -ForegroundColor Red
+    Write-Host "[X] Error: Azure OpenAI resource '$openAiResourceName' does not exist in resource group '$resourceGroup'" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ Found Azure OpenAI resource: $openAiResourceName" -ForegroundColor Green
+Write-Host "[OK] Found Azure OpenAI resource: $openAiResourceName" -ForegroundColor Green
 
 # Create role assignment
 Write-Host ""
-Write-Host "🔑 Assigning 'Cognitive Services OpenAI User' role..." -ForegroundColor Yellow
+Write-Host "[KEY] Assigning 'Cognitive Services OpenAI User' role..." -ForegroundColor Yellow
 
 $resourceScope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.CognitiveServices/accounts/$openAiResourceName"
 
 try {
     az role assignment create --assignee $userObjectId --role "Cognitive Services OpenAI User" --scope $resourceScope | Out-Null
-    Write-Host "✅ Successfully assigned role to $userEmail" -ForegroundColor Green
+    Write-Host "[OK] Successfully assigned role to $userEmail" -ForegroundColor Green
 } catch {
-    Write-Host "ℹ️  Role assignment already exists or completed" -ForegroundColor Cyan
+    Write-Host "[INFO] Role assignment already exists or completed" -ForegroundColor Cyan
 }
 
 # Get OpenAI endpoint
 $openAiEndpoint = az cognitiveservices account show --name $openAiResourceName --resource-group $resourceGroup --query properties.endpoint -o tsv
 
+# Get available deployments
 Write-Host ""
-Write-Host "📝 Creating .env file..." -ForegroundColor Yellow
+Write-Host "[DEPLOY] Checking available deployments..." -ForegroundColor Yellow
+
+try {
+    $deployments = az cognitiveservices account deployment list --name $openAiResourceName --resource-group $resourceGroup --query "[].name" -o tsv
+    if (-not $deployments) { throw "No deployments found" }
+    
+    # Handle both single and multiple deployments properly
+    $deploymentArray = @($deployments.Trim() -split "`r?`n" | Where-Object { $_.Trim() -ne "" })
+    
+    if ($deploymentArray.Count -eq 1) {
+        $selectedDeployment = $deploymentArray[0].Trim()
+        Write-Host "[OK] Found deployment: $selectedDeployment" -ForegroundColor Green
+    } else {
+        Write-Host "[INFO] Multiple deployments found:" -ForegroundColor Cyan
+        for ($i = 0; $i -lt $deploymentArray.Count; $i++) {
+            Write-Host "   $($i + 1). $($deploymentArray[$i].Trim())" -ForegroundColor White
+        }
+        do {
+            $choice = Read-Host "[SELECT] Choose deployment (1-$($deploymentArray.Count))"
+            $choiceNum = [int]$choice - 1
+        } while ($choiceNum -lt 0 -or $choiceNum -ge $deploymentArray.Count)
+        
+        $selectedDeployment = $deploymentArray[$choiceNum].Trim()
+        Write-Host "[OK] Selected deployment: $selectedDeployment" -ForegroundColor Green
+    }
+} catch {
+    Write-Host "[ERROR] Could not retrieve deployments. Using default 'gpt-4o-mini'" -ForegroundColor Red
+    $selectedDeployment = "gpt-4o-mini"
+}
+
+Write-Host ""
+Write-Host "[FILE] Creating .env file..." -ForegroundColor Yellow
 
 # Create .env file
 $envContent = @"
@@ -93,18 +125,27 @@ $envContent = @"
 
 AZURE_OPENAI_ENDPOINT=$openAiEndpoint
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
-AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o-mini
+AZURE_OPENAI_DEPLOYMENT_NAME=$selectedDeployment
 "@
 
-$envContent | Out-File -FilePath "../webapp/.env" -Encoding UTF8
+$webappDir = Join-Path (Split-Path $PSScriptRoot) "webapp"
+$envFilePath = Join-Path $webappDir ".env"
 
-Write-Host "✅ Created .env file at webapp/.env" -ForegroundColor Green
+# Ensure webapp directory exists
+if (-not (Test-Path $webappDir)) {
+    Write-Host "[ERROR] webapp directory not found at: $webappDir" -ForegroundColor Red
+    exit 1
+}
+
+$envContent | Out-File -FilePath $envFilePath -Encoding UTF8
+
+Write-Host "[OK] Created .env file at webapp/.env" -ForegroundColor Green
 
 Write-Host ""
-Write-Host "🎉 Setup complete! You can now run the application locally:" -ForegroundColor Green
+Write-Host "[SUCCESS] Setup complete! You can now run the application locally:" -ForegroundColor Green
 Write-Host ""
 Write-Host "   cd webapp" -ForegroundColor Cyan
 Write-Host "   pip install -r requirements.txt" -ForegroundColor Cyan
 Write-Host "   streamlit run app.py" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "📚 For more information, see the README.md file" -ForegroundColor Yellow
+Write-Host "[DOCS] For more information, see the README.md file" -ForegroundColor Yellow

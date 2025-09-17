@@ -8,6 +8,10 @@ from typing import Dict, Any, List
 from openai import AzureOpenAI
 from azure.identity import DefaultAzureCredential
 import logging
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +20,7 @@ logger = logging.getLogger(__name__)
 class PersonaLoader:
     """Handles loading and parsing persona configuration files"""
     
-    def __init__(self, bots_directory: str = "bots"):
+    def __init__(self, bots_directory: str = "../bots"):
         self.bots_directory = bots_directory
     
     def load_persona(self, persona_file: str) -> Dict[str, Any]:
@@ -63,7 +67,7 @@ class PersonaLoader:
 class PromptBuilder:
     """Handles building prompts from templates and persona data"""
     
-    def __init__(self, template_path: str = "templates/prompt-template.txt"):
+    def __init__(self, template_path: str = "../templates/prompt-template.txt"):
         self.template_path = template_path
         self.template_content = self._load_template()
     
@@ -211,7 +215,7 @@ class AzureOpenAIClient:
 class PersonaBot:
     """Main class that orchestrates the persona bot functionality"""
     
-    def __init__(self, bots_directory: str = "bots", template_path: str = "templates/prompt-template.txt"):
+    def __init__(self, bots_directory: str = "../bots", template_path: str = "../templates/prompt-template.txt"):
         self.persona_loader = PersonaLoader(bots_directory)
         self.prompt_builder = PromptBuilder(template_path)
         self.openai_client = AzureOpenAIClient()
