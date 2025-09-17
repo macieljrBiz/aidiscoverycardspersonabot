@@ -86,6 +86,18 @@ try {
 } catch {
     Write-Host "   ⚠️  Web app might not be ready yet: $($_.Exception.Message)" -ForegroundColor Yellow
     Write-Host "   💡 If this is a new deployment, wait a few more minutes" -ForegroundColor Cyan
+    Write-Host "   💡 Common issues: 504 errors indicate startup problems - check logs in Azure Portal" -ForegroundColor Cyan
+}
+
+# Check application logs for startup issues
+Write-Host ""
+Write-Host "5️⃣ Checking for startup issues..." -ForegroundColor Yellow
+try {
+    Write-Host "   💡 To check application logs, run:" -ForegroundColor Cyan
+    Write-Host "   az webapp log tail --name $WebAppName --resource-group $ResourceGroupName" -ForegroundColor Gray
+    Write-Host "   Or visit: https://portal.azure.com/#@/resource/subscriptions/{subscription-id}/resourceGroups/$ResourceGroupName/providers/Microsoft.Web/sites/$WebAppName/logStream" -ForegroundColor Gray
+} catch {
+    Write-Host "   ⚠️  Could not retrieve log information" -ForegroundColor Yellow
 }
 
 Write-Host ""

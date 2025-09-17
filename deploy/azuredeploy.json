@@ -172,7 +172,7 @@
         "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
         "siteConfig": {
           "linuxFxVersion": "PYTHON|3.11",
-          "appCommandLine": "python -m streamlit run webapp/app.py --server.port 8000",
+          "appCommandLine": "python -m streamlit run webapp/app.py --server.port 8000 --server.address 0.0.0.0",
           "minTlsVersion": "1.2",
           "ftpsState": "Disabled",
           "appSettings": [
@@ -182,8 +182,11 @@
             { "name": "AZURE_OPENAI_MODEL_VERSION", "value": "[parameters('openAiModelVersion')]" },
             { "name": "SCM_DO_BUILD_DURING_DEPLOYMENT", "value": "true" },
             { "name": "ENABLE_ORYX_BUILD", "value": "true" },
+            { "name": "STREAMLIT_SERVER_PORT", "value": "8000" },
+            { "name": "STREAMLIT_SERVER_ADDRESS", "value": "0.0.0.0" },
             { "name": "STREAMLIT_SERVER_ENABLE_CORS", "value": "false" },
-            { "name": "STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION", "value": "true" },
+            { "name": "STREAMLIT_SERVER_ENABLE_XSRF_PROTECTION", "value": "false" },
+            { "name": "STREAMLIT_BROWSER_GATHER_USAGE_STATS", "value": "false" },
             { "name": "APPLICATIONINSIGHTS_CONNECTION_STRING", "value": "[if(parameters('enableMonitoring'), reference(resourceId('Microsoft.Insights/components', variables('appInsightsName'))).ConnectionString, '')]" }
           ]
         }
