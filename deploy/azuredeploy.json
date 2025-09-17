@@ -58,16 +58,6 @@
       "type": "object",
       "defaultValue": {},
       "metadata": { "description": "Optional tags applied to top-level resources." }
-    },
-    "repositoryUrl": {
-      "type": "string",
-      "defaultValue": "https://github.com/macieljrBiz/aidiscoverycardspersonabot",
-      "metadata": { "description": "GitHub repository URL for automatic deployment." }
-    },
-    "repositoryBranch": {
-      "type": "string",
-      "defaultValue": "main",
-      "metadata": { "description": "GitHub repository branch to deploy from." }
     }
   },
   "variables": {
@@ -222,21 +212,6 @@
     "webAppUrl": { "type": "string", "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('webAppName'))).defaultHostName)]" },
     "openAiEndpoint": { "type": "string", "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))).endpoint]" },
     "openAiDeploymentName": { "type": "string", "value": "[parameters('openAiDeploymentName')]" },
-    "webAppPrincipalId": { "type": "string", "value": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2022-09-01', 'full').identity.principalId]" },
-    "deploymentInfo": {
-      "type": "object",
-      "value": {
-        "sourceControlEnabled": "[parameters('enableSourceControl')]",
-        "repositoryUrl": "[parameters('repositoryUrl')]",
-        "repositoryBranch": "[parameters('repositoryBranch')]",
-        "status": "[if(parameters('enableSourceControl'), 'Automatic GitHub deployment configured', 'Manual deployment required')]",
-        "nextSteps": "[if(parameters('enableSourceControl'), 'Wait 5-10 minutes for initial deployment to complete, then visit the web app URL. Check Deployment Center in Azure Portal for status.', 'Deploy your application code manually using Azure Portal Deployment Center or Azure CLI')]",
-        "troubleshooting": {
-          "deploymentCenter": "[concat('https://portal.azure.com/#@/resource', resourceId('Microsoft.Web/sites', variables('webAppName')), '/vstscd')]",
-          "manualCommand": "[concat('az webapp deployment source config --name ', variables('webAppName'), ' --resource-group ', resourceGroup().name, ' --repo-url ', parameters('repositoryUrl'), ' --branch ', parameters('repositoryBranch'), ' --manual-integration')]",
-          "commonIssues": "If automatic deployment fails: 1) Check repository is public, 2) Verify branch exists, 3) Wait 10-15 minutes for first deployment, 4) Use manual setup if needed"
-        }
-      }
-    }
+    "webAppPrincipalId": { "type": "string", "value": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2022-09-01', 'full').identity.principalId]" }
   }
 }
