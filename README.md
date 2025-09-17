@@ -257,7 +257,32 @@ sample_dialogue: |
 
 ## Troubleshooting
 
-### Common Issues
+### Azure Deployment Issues
+
+**"Deploy to Azure" button fails with ResourceNotFound error:**
+- This can happen if there's a timing issue during resource creation
+- **Solution 1**: Try deploying again - most issues are transient
+- **Solution 2**: Use manual GitHub setup scripts:
+  ```bash
+  # For bash/Linux/macOS
+  ./deploy/manual-github-setup.sh
+  
+  # For PowerShell/Windows  
+  .\deploy\manual-github-setup.ps1
+  ```
+- **Solution 3**: Configure deployment manually in Azure Portal:
+  1. Go to your App Service > Deployment Center
+  2. Select "GitHub" as source
+  3. Choose repository: `macieljrBiz/aidiscoverycardspersonabot`
+  4. Branch: `main`
+  5. Build provider: "App Service build service"
+
+**Application deployed but not working:**
+- Wait 5-10 minutes for initial deployment to complete
+- Check deployment logs in Azure Portal > App Service > Deployment Center > Logs
+- Verify environment variables are set correctly in App Service > Configuration
+
+### Common Local Development Issues
 
 - **Import errors** - Run `pip install -r requirements.txt`
 - **No personas found** - Ensure YAML files are in the `bots/` directory
