@@ -262,7 +262,12 @@ sample_dialogue: |
 **"Deploy to Azure" button fails with ResourceNotFound error:**
 - This can happen if there's a timing issue during resource creation
 - **Solution 1**: Try deploying again - most issues are transient
-- **Solution 2**: Use manual GitHub setup scripts:
+- **Solution 2**: Use the deployment verification script to check status:
+  ```powershell
+  # Run the verification script
+  .\deploy\verify-deployment.ps1 -ResourceGroupName "your-rg-name" -WebAppName "your-webapp-name"
+  ```
+- **Solution 3**: Use manual GitHub setup scripts:
   ```bash
   # For bash/Linux/macOS
   ./deploy/manual-github-setup.sh
@@ -270,7 +275,7 @@ sample_dialogue: |
   # For PowerShell/Windows  
   .\deploy\manual-github-setup.ps1
   ```
-- **Solution 3**: Configure deployment manually in Azure Portal:
+- **Solution 4**: Configure deployment manually in Azure Portal:
   1. Go to your App Service > Deployment Center
   2. Select "GitHub" as source
   3. Choose repository: `macieljrBiz/aidiscoverycardspersonabot`

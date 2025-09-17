@@ -192,59 +192,17 @@
     },
     {
       "condition": "[parameters('enableSourceControl')]",
-      "type": "Microsoft.Resources/deployments",
+      "type": "Microsoft.Web/sites/sourcecontrols", 
       "apiVersion": "2022-09-01",
-      "name": "configureSourceControl",
+      "name": "[concat(variables('webAppName'), '/web')]",
       "dependsOn": [
         "[resourceId('Microsoft.Web/sites', variables('webAppName'))]",
         "[resourceId('Microsoft.Resources/deployments', 'roleAssignOpenAiUser')]"
       ],
       "properties": {
-        "mode": "Incremental",
-        "expressionEvaluationOptions": {
-          "scope": "inner"
-        },
-        "parameters": {
-          "webAppName": {
-            "value": "[variables('webAppName')]"
-          },
-          "repositoryUrl": {
-            "value": "[parameters('repositoryUrl')]"
-          },
-          "repositoryBranch": {
-            "value": "[parameters('repositoryBranch')]"
-          }
-        },
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "parameters": {
-            "webAppName": {
-              "type": "string"
-            },
-            "repositoryUrl": {
-              "type": "string"
-            },
-            "repositoryBranch": {
-              "type": "string"
-            }
-          },
-          "resources": [
-            {
-              "type": "Microsoft.Web/sites/sourcecontrols",
-              "apiVersion": "2022-09-01",
-              "name": "[concat(parameters('webAppName'), '/web')]",
-              "properties": {
-                "repoUrl": "[parameters('repositoryUrl')]",
-                "branch": "[parameters('repositoryBranch')]",
-                "isManualIntegration": true,
-                "isGitHubAction": false,
-                "deploymentRollbackEnabled": false,
-                "isMercurial": false
-              }
-            }
-          ]
-        }
+        "repoUrl": "[parameters('repositoryUrl')]",
+        "branch": "[parameters('repositoryBranch')]",
+        "isManualIntegration": true
       }
     },
     {
@@ -289,8 +247,12 @@
         "repositoryUrl": "[parameters('repositoryUrl')]",
         "repositoryBranch": "[parameters('repositoryBranch')]",
         "status": "[if(parameters('enableSourceControl'), 'Automatic GitHub deployment configured', 'Manual deployment required')]",
-        "nextSteps": "[if(parameters('enableSourceControl'), 'Wait 5-10 minutes for initial deployment to complete, then visit the web app URL. If deployment fails, manually configure source control in Azure Portal.', 'Deploy your application code manually using: az webapp deployment source config --name YOUR_APP_NAME --resource-group YOUR_RG --repo-url https://github.com/macieljrBiz/aidiscoverycardspersonabot --branch main --manual-integration')]",
-        "troubleshooting": "If automatic deployment fails, you can manually set up deployment from Azure Portal > App Service > Deployment Center > GitHub"
+        "nextSteps": "[if(parameters('enableSourceControl'), 'Wait 5-10 minutes for initial deployment to complete, then visit the web app URL. Check Deployment Center in Azure Portal for status.', 'Deploy your application code manually using Azure Portal Deployment Center or Azure CLI')]",
+        "troubleshooting": {
+          "deploymentCenter": "[concat('https://portal.azure.com/#@/resource', resourceId('Microsoft.Web/sites', variables('webAppName')), '/vstscd')]",
+          "manualCommand": "[concat('az webapp deployment source config --name ', variables('webAppName'), ' --resource-group ', resourceGroup().name, ' --repo-url ', parameters('repositoryUrl'), ' --branch ', parameters('repositoryBranch'), ' --manual-integration')]",
+          "commonIssues": "If automatic deployment fails: 1) Check repository is public, 2) Verify branch exists, 3) Wait 10-15 minutes for first deployment, 4) Use manual setup if needed"
+        }
       }
     }
   }
