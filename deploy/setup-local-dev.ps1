@@ -73,11 +73,40 @@ Write-Host "[KEY] Assigning 'Cognitive Services OpenAI User' role..." -Foregroun
 
 $resourceScope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup/providers/Microsoft.CognitiveServices/accounts/$openAiResourceName"
 
-try {
-    az role assignment create --assignee $userObjectId --role "Cognitive Services OpenAI User" --scope $resourceScope | Out-Null
-    Write-Host "[OK] Successfully assigned role to $userEmail" -ForegroundColor Green
-} catch {
-    Write-Host "[INFO] Role assignment already exists or completed" -ForegroundColor Cyan
+# Check if role assignment already exists
+$existingAssignment = az role assignment list --assignee $userObjectId --scope $resourceScope --role "Cognitive Services OpenAI User" --query "[0].id" -o tsv
+
+if ($existingAssignment) {
+    Write-Host "[INFO] Role assignment already exists for $userEmail" -ForegroundColor Cyan
+} else {
+    try {
+        az role assignment create --assignee $userObjectId --role "Cognitive Services OpenAI User" --scope $resourceScope | Out-Null
+        Write-Host "[OK] Successfully assigned 'Cognitive Services OpenAI User' role to $userEmail" -ForegroundColor Green
+        
+        # Also assign at the resource group level as a fallback (sometimes needed for certain operations)
+        $rgScope = "/subscriptions/$subscriptionId/resourceGroups/$resourceGroup"
+        try {
+            az role assignment create --assignee $userObjectId --role "Cognitive Services OpenAI User" --scope $rgScope | Out-Null
+            Write-Host "[OK] Also assigned role at resource group level" -ForegroundColor Green
+        } catch {
+            Write-Host "[INFO] Resource group level assignment may already exist" -ForegroundColor Cyan
+        }
+        
+        Write-Host ""
+        Write-Host "[WAIT] Waiting for role assignment to propagate (30 seconds)..." -ForegroundColor Yellow
+        Start-Sleep -Seconds 30
+        
+    } catch {
+        Write-Host "[ERROR] Failed to assign role. Error details:" -ForegroundColor Red
+        Write-Host $_.Exception.Message -ForegroundColor Red
+        Write-Host ""
+        Write-Host "[MANUAL] Please manually assign the role using Azure Portal:" -ForegroundColor Yellow
+        Write-Host "1. Go to Azure Portal > $openAiResourceName > Access control (IAM)" -ForegroundColor White
+        Write-Host "2. Click 'Add role assignment'" -ForegroundColor White
+        Write-Host "3. Select 'Cognitive Services OpenAI User' role" -ForegroundColor White
+        Write-Host "4. Assign to: $userEmail" -ForegroundColor White
+        exit 1
+    }
 }
 
 # Get OpenAI endpoint
@@ -141,11 +170,30 @@ $envContent | Out-File -FilePath $envFilePath -Encoding UTF8
 
 Write-Host "[OK] Created .env file at webapp/.env" -ForegroundColor Green
 
+# Clear Azure CLI token cache to ensure fresh tokens with new permissions
+Write-Host ""
+Write-Host "[CACHE] Clearing Azure CLI token cache to refresh permissions..." -ForegroundColor Yellow
+try {
+    az account clear
+    az login | Out-Null
+    Write-Host "[OK] Successfully refreshed Azure CLI authentication" -ForegroundColor Green
+} catch {
+    Write-Host "[WARNING] Could not refresh Azure CLI cache automatically" -ForegroundColor Yellow
+    Write-Host "[MANUAL] Please run 'az logout' and then 'az login' to refresh your tokens" -ForegroundColor Yellow
+}
+
 Write-Host ""
 Write-Host "[SUCCESS] Setup complete! You can now run the application locally:" -ForegroundColor Green
 Write-Host ""
 Write-Host "   cd webapp" -ForegroundColor Cyan
 Write-Host "   pip install -r requirements.txt" -ForegroundColor Cyan
 Write-Host "   streamlit run app.py" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "[TROUBLESHOOTING] If you still get permission errors:" -ForegroundColor Yellow
+Write-Host "1. Wait 5-10 minutes for Azure role assignments to propagate" -ForegroundColor White
+Write-Host "2. Run: az logout && az login" -ForegroundColor White
+Write-Host "3. Verify your role assignment in Azure Portal:" -ForegroundColor White
+Write-Host "   Portal > $openAiResourceName > Access control (IAM) > Role assignments" -ForegroundColor White
+Write-Host "4. Look for '$userEmail' with 'Cognitive Services OpenAI User' role" -ForegroundColor White
 Write-Host ""
 Write-Host "[DOCS] For more information, see the README.md file" -ForegroundColor Yellow

@@ -66,13 +66,41 @@ echo "🔑 Assigning 'Cognitive Services OpenAI User' role..."
 
 RESOURCE_SCOPE="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.CognitiveServices/accounts/$OPENAI_RESOURCE_NAME"
 
-if az role assignment create \
-    --assignee "$USER_OBJECT_ID" \
-    --role "Cognitive Services OpenAI User" \
-    --scope "$RESOURCE_SCOPE" &> /dev/null; then
-    echo "✅ Successfully assigned role to $USER_EMAIL"
+# Check if role assignment already exists
+EXISTING_ASSIGNMENT=$(az role assignment list --assignee "$USER_OBJECT_ID" --scope "$RESOURCE_SCOPE" --role "Cognitive Services OpenAI User" --query "[0].id" -o tsv 2>/dev/null)
+
+if [ ! -z "$EXISTING_ASSIGNMENT" ]; then
+    echo "ℹ️  Role assignment already exists for $USER_EMAIL"
 else
-    echo "ℹ️  Role assignment already exists or completed"
+    if az role assignment create \
+        --assignee "$USER_OBJECT_ID" \
+        --role "Cognitive Services OpenAI User" \
+        --scope "$RESOURCE_SCOPE" &> /dev/null; then
+        echo "✅ Successfully assigned 'Cognitive Services OpenAI User' role to $USER_EMAIL"
+        
+        # Also assign at the resource group level as a fallback (sometimes needed for certain operations)
+        RG_SCOPE="/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP"
+        if az role assignment create \
+            --assignee "$USER_OBJECT_ID" \
+            --role "Cognitive Services OpenAI User" \
+            --scope "$RG_SCOPE" &> /dev/null; then
+            echo "✅ Also assigned role at resource group level"
+        else
+            echo "ℹ️  Resource group level assignment may already exist"
+        fi
+        
+        echo ""
+        echo "⏳ Waiting for role assignment to propagate (30 seconds)..."
+        sleep 30
+        
+    else
+        echo "❌ Failed to assign role. Please manually assign the role using Azure Portal:"
+        echo "1. Go to Azure Portal > $OPENAI_RESOURCE_NAME > Access control (IAM)"
+        echo "2. Click 'Add role assignment'"
+        echo "3. Select 'Cognitive Services OpenAI User' role"
+        echo "4. Assign to: $USER_EMAIL"
+        exit 1
+    fi
 fi
 
 # Get OpenAI endpoint
@@ -134,11 +162,28 @@ EOF
 
 echo "✅ Created .env file at webapp/.env"
 
+# Clear Azure CLI token cache to ensure fresh tokens with new permissions
+echo ""
+echo "🔄 Clearing Azure CLI token cache to refresh permissions..."
+if az account clear && az login &> /dev/null; then
+    echo "✅ Successfully refreshed Azure CLI authentication"
+else
+    echo "⚠️  Could not refresh Azure CLI cache automatically"
+    echo "📋 Please run 'az logout' and then 'az login' to refresh your tokens"
+fi
+
 echo ""
 echo "🎉 Setup complete! You can now run the application locally:"
 echo ""
 echo "   cd webapp"
 echo "   pip install -r requirements.txt"
 echo "   streamlit run app.py"
+echo ""
+echo "🔧 TROUBLESHOOTING: If you still get permission errors:"
+echo "1. Wait 5-10 minutes for Azure role assignments to propagate"
+echo "2. Run: az logout && az login"
+echo "3. Verify your role assignment in Azure Portal:"
+echo "   Portal > $OPENAI_RESOURCE_NAME > Access control (IAM) > Role assignments"
+echo "4. Look for '$USER_EMAIL' with 'Cognitive Services OpenAI User' role"
 echo ""
 echo "📚 For more information, see the README.md file"
