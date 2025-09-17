@@ -2,7 +2,7 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "metadata": {
-    "description": "Deploy Persona Bot (Streamlit) with Azure OpenAI GPT-4o-mini, managed identity, monitoring, and secure defaults."
+    "description": "Deploy Persona Bot (Streamlit) with Azure OpenAI GPT-4o-mini, managed identity, monitoring, secure defaults, and automatic GitHub deployment."
   },
   "parameters": {
     "location": {
@@ -58,6 +58,21 @@
       "type": "object",
       "defaultValue": {},
       "metadata": { "description": "Optional tags applied to top-level resources." }
+    },
+    "repositoryUrl": {
+      "type": "string",
+      "defaultValue": "https://github.com/macieljrBiz/aidiscoverycardspersonabot",
+      "metadata": { "description": "GitHub repository URL for automatic deployment." }
+    },
+    "repositoryBranch": {
+      "type": "string",
+      "defaultValue": "main",
+      "metadata": { "description": "GitHub repository branch to deploy from." }
+    },
+    "enableSourceControl": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": { "description": "Enable automatic deployment from GitHub repository." }
     }
   },
   "variables": {
@@ -176,6 +191,23 @@
       "tags": "[parameters('tags')]"
     },
     {
+      "condition": "[parameters('enableSourceControl')]",
+      "type": "Microsoft.Web/sites/sourcecontrols",
+      "apiVersion": "2022-09-01",
+      "name": "[concat(variables('webAppName'), '/web')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/sites', variables('webAppName'))]"
+      ],
+      "properties": {
+        "repoUrl": "[parameters('repositoryUrl')]",
+        "branch": "[parameters('repositoryBranch')]",
+        "isManualIntegration": true,
+        "isGitHubAction": false,
+        "deploymentRollbackEnabled": false,
+        "isMercurial": false
+      }
+    },
+    {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2021-04-01",
       "name": "roleAssignOpenAiUser",
@@ -209,6 +241,16 @@
     "webAppUrl": { "type": "string", "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites', variables('webAppName'))).defaultHostName)]" },
     "openAiEndpoint": { "type": "string", "value": "[reference(resourceId('Microsoft.CognitiveServices/accounts', variables('openAiAccountName'))).endpoint]" },
     "openAiDeploymentName": { "type": "string", "value": "[parameters('openAiDeploymentName')]" },
-    "webAppPrincipalId": { "type": "string", "value": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2022-09-01', 'full').identity.principalId]" }
+    "webAppPrincipalId": { "type": "string", "value": "[reference(resourceId('Microsoft.Web/sites', variables('webAppName')), '2022-09-01', 'full').identity.principalId]" },
+    "deploymentInfo": {
+      "type": "object",
+      "value": {
+        "sourceControlEnabled": "[parameters('enableSourceControl')]",
+        "repositoryUrl": "[parameters('repositoryUrl')]",
+        "repositoryBranch": "[parameters('repositoryBranch')]",
+        "status": "[if(parameters('enableSourceControl'), 'Application will be automatically deployed from GitHub', 'Manual deployment required')]",
+        "nextSteps": "[if(parameters('enableSourceControl'), 'Wait 5-10 minutes for initial deployment to complete, then visit the web app URL', 'Deploy your application code manually using Azure CLI, VS Code, or GitHub Actions')]"
+      }
+    }
   }
 }

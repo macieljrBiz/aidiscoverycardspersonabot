@@ -6,11 +6,14 @@ A web-based chat application that simulates customer personas for AI Discovery C
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FmacieljrBiz%2Faidiscoverycardspersonabot%2Fmain%2Fdeploy%2Fazuredeploy.json)
 
-Click the "Deploy to Azure" button for a one-click deployment that automatically:
-- Creates all required Azure resources (App Service, OpenAI, etc.)
-- Configures secure Managed Identity authentication
-- Deploys the application code
-- Sets up proper permissions
+Click the "Deploy to Azure" button for a **complete one-click deployment** that automatically:
+- ✅ **Creates all Azure infrastructure** (App Service, Azure OpenAI, monitoring, etc.)
+- ✅ **Deploys application code** from GitHub automatically
+- ✅ **Configures secure authentication** using Managed Identity (no API keys!)
+- ✅ **Sets up proper permissions** for seamless operation
+- ✅ **Detects deployment names** dynamically from your Azure OpenAI resource
+
+**Total deployment time: ~5-10 minutes** including both infrastructure and application code.
 
 ## Features
 
