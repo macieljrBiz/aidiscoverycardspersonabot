@@ -123,35 +123,35 @@ def load_persona(persona_file: str):
         })
         st.session_state.persona_introduced = True
         
-        st.success(f"Loaded persona: {html.escape(persona_config['name'])}")
+        st.success(f"Persona selecionada: {html.escape(persona_config['name'])}")
         
     except Exception as e:
-        st.error(f"Error loading persona: {html.escape(str(e))}")
+        st.error(f"Erro carregando persona: {html.escape(str(e))}")
         # Log the error for monitoring
-        st.warning("This incident has been logged for security monitoring.")
+        st.warning("Este incidente foi registrado para monitoramento de segurança.")
 
 def display_persona_info():
     """Display current persona information in the sidebar"""
     if st.session_state.current_persona:
-        st.sidebar.subheader("Current Persona")
+        st.sidebar.subheader("Persona atual:")
         persona = st.session_state.current_persona
         
-        st.sidebar.write(f"**Name:** {persona.get('name', 'Unknown')}")
-        st.sidebar.write(f"**Role:** {persona.get('role', 'Unknown')}")
-        st.sidebar.write(f"**Industry:** {persona.get('industry', 'Unknown')}")
-        st.sidebar.write(f"**Tech Maturity:** {persona.get('tech_maturity', 'Unknown')}")
+        st.sidebar.write(f"**Nome:** {persona.get('name', 'Unknown')}")
+        st.sidebar.write(f"**Cargo:** {persona.get('role', 'Unknown')}")
+        st.sidebar.write(f"**Industria:** {persona.get('industry', 'Unknown')}")
+        st.sidebar.write(f"**Maturidade Tecnológica:** {persona.get('tech_maturity', 'Unknown')}")
         
         # Show pain points
         pain_points = persona.get('pain_points', [])
         if pain_points:
-            st.sidebar.write("**Pain Points:**")
+            st.sidebar.write("**Principais desafios:**")
             for point in pain_points:
                 st.sidebar.write(f"• {point}")
         
         # Show goals
         goals = persona.get('goals', [])
         if goals:
-            st.sidebar.write("**Goals:**")
+            st.sidebar.write("**Expectativas:**")
             for goal in goals:
                 st.sidebar.write(f"• {goal}")
 
@@ -164,7 +164,7 @@ def main():
     st.markdown("---")
     
     # Sidebar for persona selection
-    st.sidebar.header("Persona Selection")
+    st.sidebar.header("Seleção de Persona")
     
     # Get available personas
     available_personas = st.session_state.persona_bot.list_available_personas()
@@ -176,14 +176,14 @@ def main():
     
     # Persona selection dropdown
     selected_persona = st.sidebar.selectbox(
-        "Choose a persona:",
+        "Escolha uma persona:",
         options=available_personas,
         index=0 if available_personas else None,
-        help="Select a customer persona to interact with"
+        help="Selecione uma persona de cliente para interagir com ela."
     )
     
     # Load persona button
-    if st.sidebar.button("Load Persona", type="primary"):
+    if st.sidebar.button("Carregar Persona", type="primary"):
         if selected_persona:
             load_persona(selected_persona)
             st.rerun()
@@ -192,7 +192,7 @@ def main():
     display_persona_info()
     
     # Reset conversation button
-    if st.sidebar.button("Reset Conversation"):
+    if st.sidebar.button("Reiniciar conversa"):
         if st.session_state.current_persona:
             st.session_state.messages = []
             st.session_state.persona_bot.reset_conversation()
@@ -206,7 +206,7 @@ def main():
     
     # Main chat interface
     if not st.session_state.current_persona:
-        st.info("👈 Please select and load a persona from the sidebar to start chatting!")
+        st.info("👈 Selecione uma persona e comece a conversar!")
         return
     
     # Chat container
@@ -219,11 +219,11 @@ def main():
                 st.markdown(message["content"])
     
     # Chat input
-    if prompt := st.chat_input("Ask the persona a question..."):
+    if prompt := st.chat_input("Faça uma pergunta..."):
         # Validate and sanitize user input
         sanitized_prompt = sanitize_input(prompt)
         if not sanitized_prompt:
-            st.error("Invalid input. Please check your message and try again.")
+            st.error("Entrada inválida. Por favor, verifique sua mensagem e tente novamente.")
             st.stop()
         
         # Add user message to chat history
@@ -235,49 +235,56 @@ def main():
         
         # Generate and display assistant response
         with st.chat_message("assistant"):
-            with st.spinner("Thinking..."):
-                try:
-                    response = st.session_state.persona_bot.chat(sanitized_prompt)
-                    st.markdown(response)
-                    
-                    # Add assistant response to chat history
-                    st.session_state.messages.append({"role": "assistant", "content": response})
-                    
-                except Exception as e:
-                    error_message = f"Sorry, I encountered an error: {html.escape(str(e))}"
-                    st.error(error_message)
-                    # Log the error for monitoring
-                    st.warning("This incident has been logged for security monitoring.")
-                    st.session_state.messages.append({
-                        "role": "assistant", 
-                        "content": "I apologize, but I encountered an error. Please try again or contact support if the issue persists."
-                    })
+            message_placeholder = st.empty()
+            with message_placeholder:
+                with st.spinner("Pensando..."):
+                    try:
+                        response = st.session_state.persona_bot.chat(sanitized_prompt)
+                        
+                        # Add assistant response to chat history
+                        st.session_state.messages.append({"role": "assistant", "content": response})
+                        
+                    except Exception as e:
+                        error_message = f"Desculpe, encontrei um erro: {html.escape(str(e))}"
+                        response = "Desculpe, encontrei um erro. Por favor, tente novamente ou entre em contato com o suporte se o problema persistir."
+                        
+                        # Log the error for monitoring
+                        st.error(error_message)
+                        st.warning("Este incidente foi registrado para monitoramento de segurança.")
+                        
+                        st.session_state.messages.append({
+                            "role": "assistant", 
+                            "content": response
+                        })
+            
+            # Replace spinner with actual response
+            message_placeholder.markdown(response)
     
     # Configuration help
-    with st.sidebar:
-        st.markdown("---")
-        st.subheader("Configuration")
+    # with st.sidebar:
+    #     st.markdown("---")
+    #     st.subheader("Configuration")
         
-        # Check Azure OpenAI configuration
-        config_status = check_azure_config()
-        if config_status["configured"]:
-            st.success("✅ Azure OpenAI configured (Managed Identity)")
-        else:
-            st.warning("⚠️ Azure OpenAI not configured")
-            st.write("Missing environment variables:")
-            for var in config_status["missing"]:
-                st.write(f"• {var}")
-            st.info("💡 This app uses Managed Identity for authentication")
+    #     # Check Azure OpenAI configuration
+    #     config_status = check_azure_config()
+    #     if config_status["configured"]:
+    #         st.success("✅ Azure OpenAI configured (Managed Identity)")
+    #     else:
+    #         st.warning("⚠️ Azure OpenAI not configured")
+    #         st.write("Missing environment variables:")
+    #         for var in config_status["missing"]:
+    #             st.write(f"• {var}")
+    #         st.info("💡 This app uses Managed Identity for authentication")
         
-        # Help section
-        st.markdown("---")
-        st.subheader("How to Use")
-        st.write("""
-        1. Select a persona from the dropdown
-        2. Click 'Load Persona' to start
-        3. Chat with the persona by typing questions
-        4. Use 'Reset Conversation' to start over
-        """)
+    #     # Help section
+    #     st.markdown("---")
+    #     st.subheader("How to Use")
+    #     st.write("""
+    #     1. Select a persona from the dropdown
+    #     2. Click 'Load Persona' to start
+    #     3. Chat with the persona by typing questions
+    #     4. Use 'Reset Conversation' to start over
+    #     """)
 
 def check_azure_config() -> Dict[str, any]:
     """Check if Azure OpenAI is properly configured for Managed Identity"""

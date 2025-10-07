@@ -194,7 +194,7 @@ ehthumbs.db
 Thumbs.db
 
 # Streamlit specific
-.streamlit/
+#.streamlit/
 
 # Application specific
 *.zip
