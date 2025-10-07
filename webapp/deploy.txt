@@ -1,0 +1,3 @@
+python -c "import shutil; shutil.make_archive('persona-bot', 'zip', '.', None, ['bots', 'templates', 'webapp', 'requirements.txt', 'startup.sh', 'README.md'])"
+
+az webapp deployment source config-zip --name app-personabot --resource-group rg-aidcpersonas --src persona-bot.zip

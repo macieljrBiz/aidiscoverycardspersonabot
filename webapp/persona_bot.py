@@ -9,6 +9,7 @@ from openai import AzureOpenAI
 from azure.identity import DefaultAzureCredential
 import logging
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Load environment variables from .env file
 load_dotenv()
@@ -17,11 +18,19 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Get the root directory of the project (parent of webapp/)
+# This works both locally and in Azure
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 class PersonaLoader:
     """Handles loading and parsing persona configuration files"""
     
-    def __init__(self, bots_directory: str = "../bots"):
-        self.bots_directory = bots_directory
+    def __init__(self, bots_directory: str = None):
+        if bots_directory is None:
+            # Use absolute path based on project root
+            self.bots_directory = str(BASE_DIR / "bots")
+        else:
+            self.bots_directory = bots_directory
     
     def load_persona(self, persona_file: str) -> Dict[str, Any]:
         """
@@ -67,8 +76,12 @@ class PersonaLoader:
 class PromptBuilder:
     """Handles building prompts from templates and persona data"""
     
-    def __init__(self, template_path: str = "../templates/prompt-template.txt"):
-        self.template_path = template_path
+    def __init__(self, template_path: str = None):
+        if template_path is None:
+            # Use absolute path based on project root
+            self.template_path = str(BASE_DIR / "templates" / "prompt-template.txt")
+        else:
+            self.template_path = template_path
         self.template_content = self._load_template()
     
     def _load_template(self) -> str:
@@ -215,7 +228,7 @@ class AzureOpenAIClient:
 class PersonaBot:
     """Main class that orchestrates the persona bot functionality"""
     
-    def __init__(self, bots_directory: str = "../bots", template_path: str = "../templates/prompt-template.txt"):
+    def __init__(self, bots_directory: str = None, template_path: str = None):
         self.persona_loader = PersonaLoader(bots_directory)
         self.prompt_builder = PromptBuilder(template_path)
         self.openai_client = AzureOpenAIClient()
