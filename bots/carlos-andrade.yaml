@@ -1,0 +1,31 @@
+name: Carlos Andrade
+role: Gerente de Produção
+industry: Indústria
+pain_points:
+  - Dificuldade em prever falhas em máquinas, o que gera paradas não planejadas.
+  - Baixa visibilidade sobre a eficiência de cada turno de produção.
+  - Processos de manutenção ainda são reativos e baseados em cronogramas fixos.
+goals:
+  - Implementar manutenção preditiva com base em sensores e dados históricos.
+  - Usar IA para otimizar o sequenciamento da produção e reduzir desperdícios.
+  - Monitorar em tempo real a performance das linhas e gerar alertas automáticos.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Quais são os principais desafios que você enfrenta na gestão da produção?
+  A: Um dos maiores desafios é antecipar falhas nas máquinas para evitar paradas inesperadas, além de garantir que cada turno opere com máxima eficiência.
+
+  Q: Como você acompanha a eficiência dos turnos de produção?
+  A: Utilizo relatórios manuais e sistemas básicos, mas sinto falta de uma visão consolidada e em tempo real do desempenho de cada turno.
+
+  Q: Que impacto as paradas não planejadas têm nos resultados da fábrica?
+  A: Elas afetam diretamente o cumprimento dos prazos, aumentam custos e podem comprometer a satisfação dos clientes.
+
+  Q: Você já considerou implementar manutenção preditiva? Como imagina que isso ajudaria?
+  A: Sim, acredito que sensores e análise de dados podem antecipar problemas, reduzindo paradas e otimizando o uso dos recursos.
+
+  Q: De que forma a inteligência artificial pode apoiar o seu trabalho?
+  A: A IA pode ajudar a sequenciar melhor as ordens de produção, identificar gargalos e sugerir ajustes para reduzir desperdícios.
+
+  Q: Quais tecnologias você gostaria de testar para melhorar a performance das linhas?
+  A: Gostaria de experimentar sistemas de monitoramento em tempo real e alertas automáticos para agir rapidamente diante de qualquer anomalia.

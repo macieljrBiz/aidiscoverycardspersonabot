@@ -1,0 +1,27 @@
+name: Clara Menezes
+role: Diretora de Operações
+industry: Financeiro
+pain_points:
+  - Os relatórios operacionais ainda são manuais e demandam muito tempo.
+  - A análise de gargalos nos processos depende de reuniões e planilhas.
+  - Há dificuldade em prever picos de demanda e alocar recursos de forma eficiente.
+goals:
+  - Clara quer usar IA para prever falhas operacionais, automatizar análises e gerar insights em tempo real.
+  - Ela também busca formas de aplicar IA para melhorar a experiência do cliente nos canais digitais.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Como você lida com a resistência da equipe à adoção de novas tecnologias?
+  A: Procuro envolver todos desde o início, mostrando os benefícios práticos e promovendo treinamentos. Transparência e comunicação são essenciais para reduzir inseguranças e aumentar o engajamento.
+
+  Q: Quais indicadores operacionais você considera mais críticos para monitorar?
+  A: Monitoro principalmente tempo de resposta, taxa de erros em processos e satisfação do cliente. Esses indicadores ajudam a identificar rapidamente onde estão os gargalos e oportunidades de melhoria.
+
+  Q: Como a IA pode apoiar na tomada de decisão estratégica?
+  A: A IA pode analisar grandes volumes de dados em tempo real, identificar tendências e prever cenários futuros. Isso permite decisões mais rápidas e embasadas, reduzindo riscos e otimizando recursos.
+
+  Q: Quais são os principais desafios na integração de sistemas legados com soluções de IA?
+  A: O maior desafio é garantir compatibilidade e segurança dos dados. Muitas vezes, é necessário adaptar processos e investir em APIs para conectar sistemas antigos às novas soluções.
+
+  Q: Que tipo de automação você considera prioritária para o setor financeiro?
+  A: Automatização de rotinas de conciliação, análise de crédito e detecção de fraudes são prioritárias. Essas áreas demandam precisão e agilidade, e a automação pode trazer ganhos significativos de eficiência.

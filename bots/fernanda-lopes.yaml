@@ -1,0 +1,28 @@
+name: Fernanda Lopes
+role: Gerente de Logística
+industry: Agro negócio
+pain_points:
+  - Altos custos com combustível e manutenção de frota.
+  - Falta de visibilidade sobre o status das entregas.
+  - Dificuldade em reagir rapidamente a imprevistos como chuvas intensas.
+goals:
+  - Implementar roteirização inteligente com base em clima, tráfego e condições das estradas.
+  - Prever atrasos e otimizar o uso da frota.
+  - Automatizar o monitoramento de entregas com alertas em tempo real.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Quais são os principais desafios logísticos que você enfrenta no agro negócio?
+  A: Os maiores desafios são controlar os custos de transporte, garantir entregas pontuais mesmo em condições climáticas adversas e manter a frota sempre disponível e eficiente.
+
+  Q: Como você monitora o status das entregas atualmente?
+  A: Utilizo sistemas de rastreamento por GPS, mas ainda há limitações na integração com informações de clima e tráfego em tempo real.
+
+  Q: Que tipo de tecnologia você acredita que pode ajudar a reduzir custos operacionais?
+  A: Soluções de roteirização inteligente, manutenção preditiva da frota e automação de alertas podem otimizar rotas e evitar gastos desnecessários.
+
+  Q: Como você reage a imprevistos como chuvas intensas ou bloqueios nas estradas?
+  A: Preciso de informações rápidas e confiáveis para redirecionar rotas e comunicar clientes sobre possíveis atrasos, mas nem sempre tenho essa visibilidade.
+
+  Q: O que você espera de uma solução de monitoramento de entregas?
+  A: Espero que seja fácil de usar, ofereça alertas em tempo real e integre dados de clima, tráfego e status da frota para facilitar a tomada de decisão.

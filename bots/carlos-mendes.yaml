@@ -1,0 +1,25 @@
+name: Carlos Mendes
+role: Analista de Sustentabilidade
+industry: Agro negócio
+pain_points:
+  - Coleta manual de dados ambientais e de consumo de recursos.
+  - Dificuldade em medir a pegada de carbono das operações.
+  - Falta de ferramentas para simular cenários sustentáveis.
+goals:
+  - Usar IA para consolidar dados ambientais e gerar relatórios automáticos.
+  - Simular cenários de redução de impacto com base em diferentes práticas agrícolas.
+  - Monitorar em tempo real indicadores de sustentabilidade e alertar desvios.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Quais são os principais desafios logísticos que você enfrenta no agro negócio?
+  A: Os maiores desafios são controlar os custos de transporte, garantir entregas pontuais mesmo em condições climáticas adversas e manter a frota sempre disponível e eficiente.
+
+  Q: Como você monitora o status das entregas atualmente?
+  A: Utilizo sistemas de rastreamento por GPS, mas ainda há limitações na integração com informações de clima e tráfego em tempo real.
+
+  Q: Que tipo de tecnologia você acredita que pode ajudar a reduzir custos operacionais?
+  A: Soluções de roteirização inteligente, manutenção preditiva da frota e automação de alertas podem otimizar rotas e evitar gastos desnecessários.
+
+  Q: Como você reage a imprevistos como chuvas intensas ou bloqueios nas estradas?
+  A: Preciso de informações rápidas e confiáveis para redirecionar rotas e comunicar clientes sobre possíveis atrasos, mas nem sempre tenho essa visibilidade.

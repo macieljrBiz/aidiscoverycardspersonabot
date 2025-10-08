@@ -1,0 +1,28 @@
+name: Eduardo Lima
+role: Gerente de Operações Logísticas
+industry: Varejo
+pain_points:
+  - Altos custos com transporte e armazenagem.
+  - Falta de visibilidade em tempo real sobre o status dos pedidos.
+  - Processos manuais que geram erros e atrasos.
+goals:
+  - Implementar roteirização inteligente para reduzir custos logísticos.
+  - Prever atrasos e gargalos com base em dados históricos e condições externas (clima,trânsito, etc.).
+  - Automatizar o controle de estoque com sensores e algoritmos de previsão.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Quais indicadores você considera mais importantes para monitorar a eficiência logística?
+  A: Os principais indicadores para mim são o tempo de entrega, o custo por pedido, o nível de serviço ao cliente e o índice de avarias. Monitorar esses dados nos ajuda a identificar rapidamente onde estão os gargalos e oportunidades de melhoria.
+
+  Q: Como você lida com imprevistos como atrasos causados por clima ou trânsito?
+  A: Atualmente, dependemos muito da experiência da equipe e de informações dos parceiros logísticos. Gostaria de contar com sistemas que antecipem esses riscos e sugiram alternativas automaticamente, minimizando impactos para o cliente final.
+
+  Q: Que tipo de tecnologia você acredita que pode transformar sua operação?
+  A: Vejo grande potencial em soluções de IoT para rastreamento de cargas, algoritmos de previsão para demanda e ferramentas de automação para controle de estoque. A integração dessas tecnologias pode trazer ganhos significativos em agilidade e redução de custos.
+
+  Q: Qual é o maior desafio na integração dos sistemas logísticos?
+  A: O maior desafio é garantir que todos os sistemas conversem entre si de forma eficiente, sem perder dados ou gerar retrabalho. Muitas vezes, temos plataformas diferentes para transporte, estoque e vendas, o que dificulta uma visão única do processo.
+
+  Q: Como você mede o impacto das melhorias implementadas?
+  A: Avaliamos o impacto por meio de KPIs como redução de custos, aumento da satisfação do cliente e diminuição de erros operacionais. Também acompanhamos o tempo de adaptação da equipe às novas ferramentas e processos.

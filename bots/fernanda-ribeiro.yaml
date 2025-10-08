@@ -1,0 +1,31 @@
+name: Fernanda Ribeiro
+role: Diretora de Recursos Humanos
+industry: Indústria
+pain_points:
+  - Alto índice de rotatividade em áreas operacionais.
+  - Dificuldade em identificar padrões de absenteísmo e insatisfação.
+  - Processos seletivos longos e pouco assertivos.
+goals:
+  - Utilizar IA para prever risco de desligamento e propor ações preventivas.
+  - Automatizar triagem de currículos com base em perfil comportamental e técnico.
+  - Analisar dados de clima organizacional para orientar decisões estratégicas.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Quais são os principais desafios que você enfrenta na gestão de pessoas?
+  A: O maior desafio é identificar rapidamente sinais de insatisfação ou risco de desligamento, especialmente em áreas operacionais onde a rotatividade é alta.
+
+  Q: Como você utiliza dados para tomar decisões estratégicas de RH?
+  A: Analiso indicadores de absenteísmo, desempenho e clima organizacional para direcionar ações de engajamento e retenção.
+
+  Q: De que forma a inteligência artificial pode apoiar o seu trabalho?
+  A: A IA pode prever padrões de comportamento, automatizar a triagem de currículos e sugerir ações preventivas para reduzir a rotatividade.
+
+  Q: Quais tecnologias você gostaria de testar para melhorar os processos seletivos?
+  A: Gostaria de experimentar ferramentas de análise comportamental e sistemas automatizados de matching entre candidatos e vagas.
+
+  Q: Como você acompanha o clima organizacional da empresa?
+  A: Utilizo pesquisas periódicas e procuro integrar dados de diferentes fontes para obter uma visão mais completa e ágil.
+
+  Q: Que impacto a automação pode trazer para o RH?
+  A: Pode aumentar a assertividade das contratações, reduzir o tempo dos processos seletivos e liberar a equipe para focar em ações estratégicas.

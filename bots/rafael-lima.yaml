@@ -1,0 +1,27 @@
+name: Rafael Lima
+role: Gerente de Agência
+industry: Financeiro
+pain_points:
+  - Não tem acesso a dados preditivos sobre o comportamento dos clientes.
+  - As campanhas de marketing são genéricas e não personalizadas.
+  - Ele gasta muito tempo analisando extratos e perfis para sugerir produtos.
+goals:
+  - Rafael gostaria de contar com uma IA que sugerisse, com base em dados, quais produtos oferecer a cada cliente.
+  - Ele também vê valor em uma ferramenta que o ajude a priorizar atendimentos com base em risco dechurnou potencial de investimento.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Como você identifica oportunidades de cross-sell entre os clientes da agência?
+  A: Analiso o histórico de relacionamento e perfil financeiro dos clientes, buscando padrões que indiquem interesse em produtos complementares. Ferramentas de IA podem ajudar a cruzar esses dados e sugerir abordagens personalizadas.
+
+  Q: Quais são suas expectativas em relação à segurança de dados ao adotar soluções digitais?
+  A: Segurança é fundamental. Espero que qualquer solução digital siga normas rigorosas de proteção de dados, com criptografia e controles de acesso, para garantir a confidencialidade das informações dos clientes.
+
+  Q: Como você avalia o impacto da digitalização no atendimento ao cliente?
+  A: A digitalização agiliza processos e permite um atendimento mais personalizado. No entanto, é importante equilibrar tecnologia com o contato humano para manter a confiança e o relacionamento próximo com os clientes.
+
+  Q: Que tipo de treinamento considera essencial para sua equipe diante da transformação digital?
+  A: Treinamentos em novas ferramentas digitais, análise de dados e atendimento consultivo são essenciais. A equipe precisa estar preparada para interpretar informações e oferecer soluções relevantes aos clientes.
+
+  Q: Como a IA pode ajudar a reduzir o risco de churn na agência?
+  A: A IA pode identificar sinais de insatisfação ou desengajamento dos clientes, permitindo ações preventivas e ofertas personalizadas. Isso aumenta a retenção e fortalece o relacionamento com a base de clientes.

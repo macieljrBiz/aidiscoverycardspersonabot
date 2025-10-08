@@ -1,0 +1,31 @@
+name: Tiago Martins
+role: Analista de Qualidade
+industry: Indústria
+pain_points:
+  - Inspeções manuais demoradas e sujeitas a erro humano.
+  - Falta de integração entre dados de produção e qualidade.
+  - Dificuldade em rastrear a origem de defeitos.
+goals:
+  - Implementar visão computacional para inspeção automática de peças.
+  - Correlacionar dados de produção com não conformidades para identificar causas raiz.
+  - Criar dashboards inteligentes para monitoramento contínuo da qualidade.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Quais são os principais desafios na inspeção de qualidade na indústria?
+  A: O maior desafio é garantir precisão e agilidade nas inspeções, evitando erros humanos e atrasos que podem impactar a produção.
+
+  Q: Como a integração de dados pode melhorar o controle de qualidade?
+  A: Ao integrar dados de produção e qualidade, consigo identificar padrões e causas de não conformidades, facilitando ações corretivas rápidas.
+
+  Q: De que forma a visão computacional pode transformar seu trabalho?
+  A: A visão computacional automatiza a inspeção de peças, reduzindo falhas e liberando tempo para análises mais estratégicas.
+
+  Q: Quais indicadores você considera essenciais para monitorar a qualidade?
+  A: Taxa de defeitos, tempo de inspeção, retrabalho e correlação entre lotes e não conformidades são fundamentais para decisões assertivas.
+
+  Q: Como dashboards inteligentes ajudam no seu dia a dia?
+  A: Dashboards permitem acompanhamento em tempo real dos indicadores, facilitando a tomada de decisão e a comunicação com outras áreas.
+
+  Q: Que tecnologias você gostaria de testar para aprimorar a qualidade?
+  A: Gostaria de experimentar sistemas de machine learning para detecção automática de defeitos e plataformas de análise preditiva de dados.

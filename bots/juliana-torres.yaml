@@ -1,0 +1,27 @@
+name: Juliana Torres
+role: Analista de Riscos
+industry: Financeiro
+pain_points:
+  - Os modelos de crédito são baseados em regras fixas e não se adaptam rapidamente a mudanças de mercado.
+  - A análise de risco é feita com base em dados históricos e não considera sinais em tempo real.
+  - Há resistência interna para adoção de modelos baseados em machine learning.
+goals:
+  - Juliana quer implementar modelos preditivos que aprendam com o comportamento dos clientes.
+  - Ela acredita que a IA pode ajudar a reduzir inadimplência e aumentar a precisão das análises.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Quais desafios você enfrenta ao implementar modelos preditivos no setor financeiro?
+  A: Um dos principais desafios é garantir a qualidade dos dados e superar a resistência interna à adoção de novas tecnologias. Também é importante alinhar os modelos às necessidades do negócio e às regulamentações do setor.
+
+  Q: Como você mede o sucesso dos modelos de análise de risco?
+  A: Avalio o desempenho dos modelos por meio de métricas como redução da inadimplência, aumento da precisão nas previsões e impacto nos resultados financeiros. O feedback das áreas de negócio também é fundamental.
+
+  Q: Que fatores considera essenciais para a adoção de IA na análise de crédito?
+  A: Transparência nos modelos, facilidade de integração com sistemas existentes e capacitação da equipe são essenciais. Além disso, é importante garantir conformidade com normas regulatórias e proteção dos dados dos clientes.
+
+  Q: Como lida com mudanças rápidas no mercado que afetam o risco de crédito?
+  A: Busco atualizar constantemente os modelos com dados recentes e incorporar sinais em tempo real. A colaboração com outras áreas e o uso de ferramentas analíticas avançadas ajudam a responder rapidamente às mudanças.
+
+  Q: Qual o papel da liderança na transformação digital do setor financeiro?
+  A: A liderança deve incentivar a inovação, apoiar a capacitação da equipe e promover uma cultura aberta à experimentação. É fundamental que os líderes estejam engajados para superar barreiras e garantir o sucesso das iniciativas digitais.

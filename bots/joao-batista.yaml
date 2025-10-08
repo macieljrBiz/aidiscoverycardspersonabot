@@ -1,0 +1,28 @@
+name: João Batista
+role: Diretor de Produção
+industry: Agro negócio
+pain_points:
+  - Dificuldade em prever pragas e doenças com antecedência.
+  - Uso ineficiente de insumos como fertilizantes e defensivos.
+  - Baixa integração entre dados de campo e decisões operacionais.
+goals:
+  - Utilizar modelos preditivos para antecipar surtos de pragas e otimizar o uso de insumos.
+  - Integrar sensores de solo e clima com algoritmos de recomendação para decisões em tempo real.
+  - Automatizar relatórios de produtividade por talhão.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Quais são os principais desafios que você enfrenta na produção agrícola atualmente?
+  A: Um dos maiores desafios é prever pragas e doenças com antecedência suficiente para agir de forma preventiva. Além disso, integrar dados de campo às decisões operacionais ainda é uma dificuldade.
+
+  Q: Como você utiliza dados de sensores de solo e clima no dia a dia?
+  A: Utilizo sensores para monitorar umidade, temperatura e nutrientes do solo. Esses dados são integrados a sistemas de recomendação que ajudam a tomar decisões mais precisas sobre irrigação e aplicação de insumos.
+
+  Q: De que forma a automação de relatórios impacta sua rotina?
+  A: A automação dos relatórios de produtividade por talhão economiza tempo e reduz erros, permitindo que eu foque em estratégias para aumentar a eficiência da produção.
+
+  Q: O que você espera de soluções tecnológicas para o agro negócio?
+  A: Espero que as soluções tragam maior previsibilidade, integração dos dados e facilidade de uso, além de contribuir para a sustentabilidade e rentabilidade da operação.
+
+  Q: Como você lida com a resistência à adoção de novas tecnologias na equipe?
+  A: Procuro mostrar os benefícios práticos das ferramentas, promover treinamentos e envolver todos no processo de implementação para garantir maior aceitação e engajamento.

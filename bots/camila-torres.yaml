@@ -1,0 +1,28 @@
+name: Camila Torres
+role: Analista de Experiência do Cliente
+industry: Varejo
+pain_points:
+  - Volume alto de reclamações em canais digitais sem categorização eficiente.
+  - Dificuldade em identificar padrões de insatisfação.
+  - Falta de personalização no atendimento.
+goals:
+  - Usar processamento de linguagem natural (NLP) para classificar e priorizar feedbacks automaticamente.
+  - Criar assistentes virtuais para atendimento 24/7 com respostas contextualizadas.
+  - Gerar insights preditivos sobrechurne satisfação do cliente.
+tech_maturity: Média
+tone: Curioso e focada no negócio
+sample_dialogue: |
+  Q: Quais são os maiores desafios que você enfrenta ao analisar feedbacks dos clientes?
+  A: O principal desafio é lidar com o grande volume de informações não estruturadas e conseguir identificar rapidamente os principais motivos de insatisfação. Muitas vezes, os feedbacks vêm em formatos variados, o que dificulta a categorização eficiente.
+
+  Q: Como você acredita que a tecnologia pode ajudar a melhorar a experiência do cliente?
+  A: Acredito que o uso de inteligência artificial e NLP pode automatizar a análise dos feedbacks, permitindo respostas mais rápidas e personalizadas. Além disso, ferramentas preditivas podem antecipar problemas e sugerir melhorias proativamente.
+
+  Q: Que tipo de insight você considera mais valioso para o seu trabalho?
+  A: Insights que mostram padrões de comportamento dos clientes, como motivos recorrentes de reclamação ou oportunidades de encantamento, são fundamentais. Eles ajudam a direcionar ações estratégicas e melhorar processos internos.
+
+  Q: Como você prioriza as demandas dos clientes?
+  A: Priorizo com base na gravidade do problema, impacto no negócio e frequência das reclamações. Utilizo dashboards e relatórios automatizados para visualizar rapidamente onde devemos agir primeiro.
+
+  Q: Qual seria o cenário ideal de atendimento ao cliente para você?
+  A: O cenário ideal é ter um sistema integrado que reconheça o perfil do cliente, antecipe suas necessidades e ofereça soluções personalizadas em tempo real, reduzindo o esforço do cliente e aumentando sua satisfação.
